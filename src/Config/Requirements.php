@@ -20,6 +20,7 @@ use ThePluginName\Common\Utils\Errors;
  * Check if any requirements are needed to run this plugin. We use the
  * "Requirements" package from "MicroPackage" to check if any PHP Extensions,
  * plugins, themes or PHP/WP version are required.
+ *
  * @docs https://github.com/micropackage/requirements
  *
  * @package ThePluginName\Config
@@ -27,10 +28,12 @@ use ThePluginName\Common\Utils\Errors;
  */
 final class Requirements extends Base {
 
-    /**
-     * @var array
-     */
-    public $requirements;
+	/**
+	 * Represents the requirements.
+	 *
+	 * @var array
+	 */
+	public $requirements;
 
 	/**
 	 * Specifications for the requirements
@@ -39,24 +42,27 @@ final class Requirements extends Base {
 	 * @since 1.0.0
 	 */
 	public function specifications(): array {
-		return apply_filters( 'the_plugin_name_plugin_requirements', [
-			'php'            => $this->plugin->requiredPhp(),
-			'php_extensions' => [
-				/**
-				 * 'mbstring'
-				 */
-			],
-			'wp'             => $this->plugin->requiredWp(),
-			'plugins'        => [
-				/**
-				 * [
-				 *  'file'    => 'hello-dolly/hello.php',
-				 *  'name'    => 'Hello Dolly',
-				 *  'version' => '1.5'
-				 * ],
-				 */
-			],
-		] );
+		return apply_filters(
+			'the_plugin_name_plugin_requirements',
+			array(
+				'php'            => $this->plugin->requiredPhp(),
+				'php_extensions' => array(
+					/**
+					 * 'mbstring'
+					 */
+				),
+				'wp'             => $this->plugin->requiredWp(),
+				'plugins'        => array(
+					/**
+					 * [
+					 *  'file'    => 'hello-dolly/hello.php',
+					 *  'name'    => 'Hello Dolly',
+					 *  'version' => '1.5'
+					 * ],
+					 */
+				),
+			)
+		);
 	}
 
 	/**
@@ -65,20 +71,20 @@ final class Requirements extends Base {
 	 * @since 1.0.0
 	 */
 	public function check() {
-		// We use "Requirements" if the package is required and installed by composer.json
+		// We use "Requirements" if the package is required and installed by composer.json.
 		if ( class_exists( '\Micropackage\Requirements\Requirements' ) ) {
 			$this->requirements = new \Micropackage\Requirements\Requirements(
 				$this->plugin->name(),
 				$this->specifications()
 			);
 			if ( ! $this->requirements->satisfied() ) {
-				// Print notice
+				// Print notice.
 				$this->requirements->print_notice();
-				// Kill plugin
+				// Kill plugin.
 				Errors::pluginDie();
 			}
 		} else {
-			// Else we do a version check based on version_compare
+			// Else we do a version check based on version_compare.
 			$this->versionCompare();
 		}
 	}
@@ -90,9 +96,9 @@ final class Requirements extends Base {
 	 */
 	public function versionCompare() {
 		foreach (
-			[
-				// PHP version check
-				[
+			array(
+				// PHP version check.
+				array(
 					'current' => phpversion(),
 					'compare' => $this->plugin->requiredPhp(),
 					'title'   => __( 'Invalid PHP version', 'the-plugin-name-text-domain' ),
@@ -101,9 +107,9 @@ final class Requirements extends Base {
 						$this->plugin->requiredPhp(),
 						phpversion()
 					),
-				],
-				// WP version check
-				[
+				),
+				// WP version check.
+				array(
 					'current' => get_bloginfo( 'version' ),
 					'compare' => $this->plugin->requiredWp(),
 					'title'   => __( 'Invalid WordPress version', 'the-plugin-name-text-domain' ),
@@ -112,14 +118,14 @@ final class Requirements extends Base {
 						$this->plugin->requiredWp(),
 						get_bloginfo( 'version' )
 					),
-				],
-			] as $compat_check ) {
+				),
+			) as $compat_check ) {
 			if ( version_compare(
 				$compat_check['compare'],
 				$compat_check['current'],
 				'>='
 			) ) {
-				// Kill plugin
+				// Kill plugin.
 				Errors::pluginDie(
 					$compat_check['message'],
 					$compat_check['title'],

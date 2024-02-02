@@ -42,9 +42,9 @@ $the_plugin_name_autoloader = require plugin_dir_path( _THE_PLUGIN_NAME_PLUGIN_F
  *
  * @since 1.0.0
  */
-register_activation_hook( __FILE__, [ 'ThePluginName\Config\Setup', 'activation' ] );
-register_deactivation_hook( __FILE__, [ 'ThePluginName\Config\Setup', 'deactivation' ] );
-register_uninstall_hook( __FILE__, [ 'ThePluginName\Config\Setup', 'uninstall' ] );
+register_activation_hook( __FILE__, array( 'ThePluginName\Config\Setup', 'activation' ) );
+register_deactivation_hook( __FILE__, array( 'ThePluginName\Config\Setup', 'deactivation' ) );
+register_uninstall_hook( __FILE__, array( 'ThePluginName\Config\Setup', 'uninstall' ) );
 
 /**
  * Bootstrap the plugin
@@ -52,18 +52,20 @@ register_uninstall_hook( __FILE__, [ 'ThePluginName\Config\Setup', 'uninstall' ]
  * @since 1.0.0
  */
 if ( ! class_exists( '\ThePluginName\Bootstrap' ) ) {
-	wp_die( __( '{{The Plugin Name}} is unable to find the Bootstrap class.', 'the-plugin-name-text-domain' ) );
+	wp_die( esc_html__( '{{The Plugin Name}} is unable to find the Bootstrap class.', 'the-plugin-name-text-domain' ) );
 }
 add_action(
 	'plugins_loaded',
 	static function () use ( $the_plugin_name_autoloader ) {
 		/**
+		 * Callback function
+		 *
 		 * @see \ThePluginName\Bootstrap
 		 */
 		try {
 			new \ThePluginName\Bootstrap( $the_plugin_name_autoloader );
 		} catch ( Exception $e ) {
-			wp_die( __( '{{The Plugin Name}} is unable to run the Bootstrap class.', 'the-plugin-name-text-domain' ) );
+			wp_die( esc_html__( '{{The Plugin Name}} is unable to run the Bootstrap class.', 'the-plugin-name-text-domain' ) );
 		}
 	}
 );

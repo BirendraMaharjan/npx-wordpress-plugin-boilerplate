@@ -37,21 +37,26 @@ final class Plugin {
 	 * @since 1.0.0
 	 */
 	public function data(): array {
-		$plugin_data = apply_filters( 'the_plugin_name_plugin_data', [
-			'settings'               => get_option( 'the-plugin-name-settings' ),
-			'plugin_path'            => untrailingslashit(
-				plugin_dir_path( _THE_PLUGIN_NAME_PLUGIN_FILE )  // phpcs:disable ImportDetection.Imports.RequireImports.Symbol -- this constant is global
-			),
-			'plugin_template_folder' => 'templates',
-			'ext_template_folder'    => 'the-plugin-name-templates',
+		$plugin_data = apply_filters(
+			'the_plugin_name_plugin_data',
+			array(
+				'settings'               => get_option( 'the-plugin-name-settings' ),
+				'plugin_path'            => untrailingslashit(
+					plugin_dir_path( _THE_PLUGIN_NAME_PLUGIN_FILE )  // phpcs:disable ImportDetection.Imports.RequireImports.Symbol -- this constant is global
+				),
+				'plugin_template_folder' => 'templates',
+				'ext_template_folder'    => 'the-plugin-name-templates',
 			/**
 			 * Add extra data here
 			 */
-		] );
+			)
+		);
 		return array_merge(
-			apply_filters( 'the_plugin_name_plugin_meta_data',
-				get_file_data( _THE_PLUGIN_NAME_PLUGIN_FILE, // phpcs:disable ImportDetection.Imports.RequireImports.Symbol -- this constant is global
-					[
+			apply_filters(
+				'the_plugin_name_plugin_meta_data',
+				get_file_data(
+					_THE_PLUGIN_NAME_PLUGIN_FILE, // phpcs:disable ImportDetection.Imports.RequireImports.Symbol -- this constant is global
+					array(
 						'name'         => 'Plugin Name',
 						'uri'          => 'Plugin URI',
 						'description'  => 'Description',
@@ -63,9 +68,11 @@ final class Plugin {
 						'required-php' => 'Requires PHP',
 						'required-wp'  => 'Requires WP',
 						'namespace'    => 'Namespace',
-					], 'plugin'
+					),
+					'plugin'
 				)
-			), $plugin_data
+			),
+			$plugin_data
 		);
 	}
 

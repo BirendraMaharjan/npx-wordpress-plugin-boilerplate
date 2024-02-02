@@ -23,10 +23,12 @@ use ThePluginName\Config\Plugin;
  */
 abstract class Base {
 	/**
+	 * Data container for plugin configuration.
+	 *
 	 * @var array : will be filled with data from the plugin config class
 	 * @see Plugin
 	 */
-	protected $plugin = [];
+	protected $plugin = array();
 
 	/**
 	 * Base constructor.

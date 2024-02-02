@@ -27,7 +27,7 @@ class Templates extends Base {
 	 *
 	 * @var array
 	 */
-	private $path_cache = [];
+	private $path_cache = array();
 
 	/**
 	 * Initialize the class.
@@ -47,29 +47,35 @@ class Templates extends Base {
 		/**
 		 * Example code using the get template function with the use of arguments
 		 */
-		add_action( 'wp_footer', function () {
-			$this->get( 'test-template', null,
-				[
-					'class' => 'user',
-					'data'  =>
-						[ 'text' => 'with arguments' ],
-				]
-			);
-		} );
+		add_action(
+			'wp_footer',
+			function () {
+				$this->get(
+					'test-template',
+					null,
+					array(
+						'class' => 'user',
+						'data'  =>
+							array( 'text' => 'with arguments' ),
+					)
+				);
+			}
+		);
 	}
 
 	/**
 	 * Retrieve a template part, modified version of:
+	 *
 	 * @url https://github.com/GaryJones/Gamajo-Template-Loader
 	 *
-	 * @param string $slug Template slug.
-	 * @param string $name Optional. Template variation name. Default null.
-	 * @param bool $load Optional. Whether to load template. Default true.
-	 * @return string
+	 * @param string      $slug The template slug.
+	 * @param string|null $name The template variation name (optional).
+	 * @param array       $args Additional arguments for template retrieval (optional).
+	 * @param bool        $load Whether to load the located template file (optional, default: true).
+	 * @return string|bool The located template file path if found, or false if not found.
 	 * @since 1.0.0
-	 *
 	 */
-	public function get( $slug, $name = null, $args = [], $load = true ): string {
+	public function get( $slug, $name = null, $args = array(), $load = true ): string {
 		// Execute code for this part.
 		do_action( 'get_template_part_' . $slug, $slug, $name, $args ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'the_plugin_name_get_template_part_' . $slug, $slug, $name, $args );
@@ -81,16 +87,17 @@ class Templates extends Base {
 
 	/**
 	 * Given a slug and optional name, create the file names of templates, modified version of:
+	 *
 	 * @url https://github.com/GaryJones/Gamajo-Template-Loader
 	 *
-	 * @param string $slug Template slug.
-	 * @param string $name Template variation name.
-	 * @param $args
-	 * @return array
+	 * @param string      $slug The template slug.
+	 * @param string|null $name The template variation name (optional).
+	 * @param array       $args Additional arguments for template retrieval.
+	 * @return array The template file names in the order of most specific to least specific.
 	 * @since 1.0.0
 	 */
 	protected function getFileNames( $slug, $name, $args ): array {
-		$templates = [];
+		$templates = array();
 		if ( isset( $name ) ) {
 			$templates[] = $slug . '-' . $name . '.php';
 		}
@@ -105,13 +112,13 @@ class Templates extends Base {
 		 * @param string $slug Template slug.
 		 * @param string $name Template variation name.
 		 * @since 1.0.0
-		 *
 		 */
 		return apply_filters( 'the_plugin_name_get_template_part', $templates, $slug, $name, $args );
 	}
 
 	/**
 	 * Retrieve the name of the highest priority template file that exists, modified version of:
+	 *
 	 * @url https://github.com/GaryJones/Gamajo-Template-Loader
 	 *
 	 * Searches in the STYLESHEETPATH before TEMPLATEPATH so that themes which
@@ -119,14 +126,14 @@ class Templates extends Base {
 	 * not found in either of those, it looks in the theme-compat folder last.
 	 *
 	 * @param string|array $template_names Template file(s) to search for, in order.
-	 * @param bool $load If true the template file will be loaded if it is found.
-	 * @param bool $require_once Whether to require_once or require. Default true.
-	 *                                     Has no effect if $load is false.
-	 * @param array $args
+	 * @param bool         $load If true the template file will be loaded if it is found.
+	 * @param bool         $require_once_file Whether to require_once or require. Default true.
+	 *                                                      Has no effect if $load is false.
+	 * @param array        $args Additional arguments for template loading (optional).
 	 * @return string The template filename if one is located.
 	 * @since 1.0.0
 	 */
-	public function locate( $template_names, $load = false, $require_once = true, $args = [] ): string {
+	public function locate( $template_names, $load = false, $require_once_file = true, $args = array() ): string {
 		// Use $template_names as a cache key - either first element of array or the variable itself if it's a string.
 		$cache_key = is_array( $template_names ) ? $template_names[0] : $template_names;
 		// If the key is in the cache array, we've already located this file.
@@ -154,13 +161,14 @@ class Templates extends Base {
 			}
 		}
 		if ( $load && $located ) {
-			load_template( $located, $require_once, $args );
+			load_template( $located, $require_once_file, $args );
 		}
 		return $located;
 	}
 
 	/**
 	 * Return a list of paths to check for template locations, modified version of:
+	 *
 	 * @url https://github.com/GaryJones/Gamajo-Template-Loader
 	 *
 	 * Default is to check in a child theme (if relevant) before a parent theme, so that themes which inherit from a
@@ -169,15 +177,14 @@ class Templates extends Base {
 	 *
 	 * @return mixed|void
 	 * @since 1.0.0
-	 *
 	 */
 	protected function getPaths(): array {
 		$theme_directory = trailingslashit( $this->plugin->extTemplateFolder() );
 
-		$file_paths = [
+		$file_paths = array(
 			10  => trailingslashit( get_template_directory() ) . $theme_directory,
 			100 => $this->plugin->templatePath(),
-		];
+		);
 		// Only add this conditionally, so non-child themes don't redundantly check active theme twice.
 		if ( get_stylesheet_directory() !== get_template_directory() ) {
 			$file_paths[1] = trailingslashit( get_stylesheet_directory() ) . $theme_directory;
@@ -187,7 +194,6 @@ class Templates extends Base {
 		 *
 		 * @param array $var Default is directory in child theme at index 1, parent theme at 10, and plugin at 100.
 		 * @since 1.0.0
-		 *
 		 */
 		$file_paths = apply_filters( 'the_plugin_name_template_paths', $file_paths );
 		// Sort the file paths based on priority.

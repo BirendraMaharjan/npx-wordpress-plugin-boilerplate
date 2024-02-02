@@ -36,7 +36,7 @@ class Shortcodes extends Base {
 		 * Add plugin code here
 		 */
 
-		add_shortcode( 'foobar', [ $this, 'foobarFunc' ] );
+		add_shortcode( 'foobar', array( $this, 'foobarFunc' ) );
 	}
 
 	/**
@@ -48,10 +48,11 @@ class Shortcodes extends Base {
 	 */
 	public function foobarFunc( array $atts ): string {
 		shortcode_atts(
-			[
+			array(
 				'foo' => 'something',
 				'bar' => 'something else',
-			], $atts
+			),
+			$atts
 		);
 		return '<span class="foo">foo = ' . $atts['foo'] . '</span>' .
 			'<span class="bar">foo = ' . $atts['bar'] . '</span>';

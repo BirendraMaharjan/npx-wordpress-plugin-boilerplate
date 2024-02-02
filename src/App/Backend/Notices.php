@@ -37,7 +37,7 @@ class Notices extends Base {
 		 *
 		 * Add plugin code here for admin notices specific functions
 		 */
-		add_action( 'admin_notices', [ $this, 'exampleAdminNotice' ] );
+		add_action( 'admin_notices', array( $this, 'exampleAdminNotice' ) );
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Notices extends Base {
 		global $pagenow;
 		if ( $pagenow === 'options-general.php' ) {
 			echo '<div class="notice notice-warning is-dismissible">
-             <p>' . __( 'This is an example of a notice that appears on the settings page.', 'the-plugin-name-text-domain' ) . '</p>
+             <p>' . esc_html__( 'This is an example of a notice that appears on the settings page.', 'the-plugin-name-text-domain' ) . '</p>
          </div>';
 		}
 	}

@@ -8,13 +8,16 @@
  * @license   {{author_license}}
  * @link      {{author_url}}
  */
+
 ?>
 <p>
-    <?php
-    /**
-     * @see \ThePluginName\App\Frontend\Templates
-     * @var $args
-     */
-    echo __( 'This is being loaded inside "wp_footer" from the templates class', 'the-plugin-name-text-domain' ) . ' ' . $args[ 'data' ][ 'text' ];
-    ?>
+	<?php
+	/**
+	 * Description of the file or purpose.
+	 *
+	 * @see \ThePluginName\App\Frontend\Templates
+	 * @var $args
+	 */
+	echo esc_html__( 'This is being loaded inside "wp_footer" from the templates class', 'the-plugin-name-text-domain' ) . ' ' . esc_html( $args['data']['text'] );
+	?>
 </p>

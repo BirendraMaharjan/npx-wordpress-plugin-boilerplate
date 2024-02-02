@@ -37,11 +37,16 @@ class Example extends Base {
 		 */
 
 		if ( class_exists( 'WP_REST_Server' ) ) {
-			add_action( 'rest_api_init', [ $this, 'addPluginRestApi' ] );
+			add_action( 'rest_api_init', array( $this, 'addPluginRestApi' ) );
 		}
 	}
 
 	/**
+	 * Adds custom functionalities to the plugin's REST API.
+	 *
+	 * This method is responsible for adding custom fields and routes to enhance the functionality
+	 * of the plugin within the WordPress REST API.
+	 *
 	 * @since 1.0.0
 	 */
 	public function addPluginRestApi() {
@@ -58,14 +63,14 @@ class Example extends Base {
 		register_rest_field(
 			'demo',
 			$this->plugin->textDomain() . '_text',
-			[
-				'get_callback'    => [ $this, 'getTextField' ],
-				'update_callback' => [ $this, 'updateTextField' ],
-				'schema'          => [
+			array(
+				'get_callback'    => array( $this, 'getTextField' ),
+				'update_callback' => array( $this, 'updateTextField' ),
+				'schema'          => array(
 					'description' => __( 'Text field demo of Post type', 'the-plugin-name-text-domain' ),
 					'type'        => 'string',
-				],
-			]
+				),
+			)
 		);
 	}
 
@@ -76,24 +81,24 @@ class Example extends Base {
 	 * @since 1.0.0
 	 */
 	public function addCustomRoute() {
-		// Only an example with 2 parameters
+		// Only an example with 2 parameters.
 		register_rest_route(
 			'wp/v2',
 			'/calc',
-			[
+			array(
 				'methods'  => \WP_REST_Server::READABLE,
-				'callback' => [ $this, 'sum' ],
-				'args'     => [
-					'first'  => [
+				'callback' => array( $this, 'sum' ),
+				'args'     => array(
+					'first'  => array(
 						'default'           => 10,
 						'sanitize_callback' => 'absint',
-					],
-					'second' => [
+					),
+					'second' => array(
 						'default'           => 1,
 						'sanitize_callback' => 'absint',
-					],
-				],
-			]
+					),
+				),
+			)
 		);
 	}
 
@@ -113,9 +118,9 @@ class Example extends Base {
 	/**
 	 * Examples
 	 *
-	 * @param string $value Value.
+	 * @param string   $value Value.
 	 * @param \WP_Post $post Post object.
-	 * @param string $key Key.
+	 * @param string   $key Key.
 	 * @return \WP_Error
 	 * @since 1.0.0
 	 */
@@ -126,7 +131,7 @@ class Example extends Base {
 			return new \WP_Error(
 				'rest_post_views_failed',
 				\__( 'Failed to update post views.', 'the-plugin-name-text-domain' ),
-				[ 'status' => 500 ]
+				array( 'status' => 500 )
 			);
 		}
 
@@ -141,6 +146,6 @@ class Example extends Base {
 	 * @since 1.0.0
 	 */
 	public function sum( array $data ): array {
-		return [ 'result' => $data['first'] + $data['second'] ];
+		return array( 'result' => $data['first'] + $data['second'] );
 	}
 }

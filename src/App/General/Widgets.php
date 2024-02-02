@@ -38,9 +38,11 @@ class Widgets extends Base {
 		 * from the integration class file self
 		 * @see HTML_Widget::init()
 		 */
-		add_action( 'widgets_init', function () {
-			register_widget( $this->plugin->namespace() . '\Integrations\Widget\HTML_Widget' );
-		} );
+		add_action(
+			'widgets_init',
+			function () {
+				register_widget( $this->plugin->namespace() . '\Integrations\Widget\HTML_Widget' );
+			}
+		);
 	}
 }
-

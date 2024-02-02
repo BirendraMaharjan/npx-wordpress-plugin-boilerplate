@@ -24,20 +24,22 @@ use WP_Widget;
 class HTML_Widget extends WP_Widget {
 
 	/**
+	 * Get the plugin metadata from the Plugin
+	 *
 	 * @var array : will be filled with data from the plugin config class
 	 * @see Plugin
 	 */
-	protected $plugin = [];
+	protected $plugin = array();
 
 	/**
 	 * Default instance.
 	 *
 	 * @var   array
 	 */
-	protected $default_instance = [
+	protected $default_instance = array(
 		'title'   => '',
 		'content' => '',
-	];
+	);
 
 	/**
 	 * Initialize the class.
@@ -63,12 +65,12 @@ class HTML_Widget extends WP_Widget {
 	 */
 	public function __construct() {
 		$this->plugin = Plugin::init();
-		$widget_ops = [
+		$widget_ops   = array(
 			'classname'                   => 'widget_html',
 			'description'                 => __( 'Displays HTML code with syntax highlighting.', 'the-plugin-name-text-domain' ),
 			'customize_selective_refresh' => true,
-		];
-		$control_ops = [];
+		);
+		$control_ops  = array();
 		parent::__construct( 'the-plugin-name-text-domain', __( 'HTML Test Widget', 'the-plugin-name-text-domain' ), $widget_ops, $control_ops );
 	}
 
@@ -82,7 +84,7 @@ class HTML_Widget extends WP_Widget {
 	public function widget( $args, $instance ) {
 
 		$instance = array_merge( $this->default_instance, $instance );
-		$content = $instance['content'];
+		$content  = $instance['content'];
 
 		/**
 		 * Filters the content of the HTML Code widget.
@@ -92,9 +94,9 @@ class HTML_Widget extends WP_Widget {
 		 * @since 0.1.0
 		 */
 		$content = apply_filters( 'the_plugin_name_html_widget_content', $content, $instance, $this );
-		echo $args['before_widget'];
-		echo $content;
-		echo $args['after_widget'];
+		echo wp_kses_post( $args['before_widget'] );
+		echo wp_kses_post( $content );
+		echo wp_kses_post( $args['after_widget'] );
 	}
 
 	/**

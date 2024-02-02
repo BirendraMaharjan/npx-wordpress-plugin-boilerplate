@@ -23,6 +23,7 @@ final class Classes {
 
 	/**
 	 * Init the classes inside these folders based on type of request.
+	 *
 	 * @see Requester for all the type of requests or to add your own
 	 */
 	public static function get(): array {

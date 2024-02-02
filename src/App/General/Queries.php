@@ -40,19 +40,24 @@ class Queries extends Base {
 	}
 
 	/**
-	 * @param $posts_count
-	 * @param string $orderby
-	 * @return \WP_Query
+	 * Retrieve a custom query for fetching posts.
+	 *
+	 * This method returns a custom WP_Query object for retrieving posts based on specified parameters.
+	 *
+	 * @param int    $posts_count The number of posts to retrieve.
+	 * @param string $orderby     Optional. The parameter to order the posts by (default: 'date').
+	 *
+	 * @return \WP_Query The custom WP_Query object for retrieving posts.
 	 */
 	public function getPosts( $posts_count, $orderby = 'date' ): \WP_Query {
 		return new \WP_Query(
-			[
+			array(
 				'post_type'      => PostTypes::POST_TYPE['id'],
 				'post_status'    => 'publish',
 				'order'          => 'DESC',
 				'posts_per_page' => $posts_count,
 				'orderby'        => $orderby,
-			]
+			)
 		);
 	}
 
@@ -63,6 +68,18 @@ class Queries extends Base {
 	 */
 	public function getPostIds(): array {
 		global $wpdb;
-		return $wpdb->get_col( "select ID from {$wpdb->posts} LIMIT 3" );
+
+		$cache_key = 'my_custom_query_result';
+		$post_ids  = wp_cache_get( $cache_key, 'my_custom_query_group' );
+
+		if ( false === $post_ids ) {
+			// Query the database if not found in the cache.
+			$post_ids = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} LIMIT 3" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+
+			// Cache the result.
+			wp_cache_set( $cache_key, $post_ids, 'my_custom_query_group' );
+		}
+
+		return $post_ids;
 	}
 }

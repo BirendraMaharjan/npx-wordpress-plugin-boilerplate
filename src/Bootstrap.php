@@ -40,14 +40,14 @@ final class Bootstrap extends Base {
 	 *
 	 * @var array
 	 */
-	public $bootstrap = [ 'debug' => false ];
+	public $bootstrap = array( 'debug' => false );
 
 	/**
 	 * List of class to init
 	 *
 	 * @var array : classes
 	 */
-	public $class_list = [];
+	public $class_list = array();
 
 	/**
 	 * Composer autoload file list
@@ -74,10 +74,12 @@ final class Bootstrap extends Base {
 	 * Bootstrap constructor that
 	 * - Checks compatibility/plugin requirements
 	 * - Defines the locale for this plugin for internationalization
-	 * - Load the classes via Composer's class loader and initialize them on type of request
+	 * - Load the classes via Composer's class loader and initialize them on the type of request
 	 *
 	 * @param \Composer\Autoload\ClassLoader $composer Composer autoload output.
-	 * @throws \Exception
+	 *
+	 * @throws \Exception If there is an issue with compatibility, requirements, or loading classes.
+	 *
 	 * @since 1.0.0
 	 */
 	public function __construct( $composer ) {
@@ -96,7 +98,7 @@ final class Bootstrap extends Base {
 	 * @since 1.0.0
 	 */
 	public function checkRequirements() {
-		$set_timer = microtime( true );
+		$set_timer          = microtime( true );
 		$this->requirements = new Requirements();
 		$this->requirements->check();
 		$this->bootstrap['check_requirements'] = $this->stopExecutionTimer( $set_timer );
@@ -108,16 +110,17 @@ final class Bootstrap extends Base {
 	 * @since 1.0.0
 	 */
 	public function setLocale() {
-		$set_timer = microtime( true );
+		$set_timer  = microtime( true );
 		$this->i18n = new I18n();
 		$this->i18n->load();
 		$this->bootstrap['set_locale'] = $this->stopExecutionTimer( $set_timer );
 	}
 
 	/**
-	 * Get the class loader from Composer
+	 * Set the Composer class loader.
 	 *
-	 * @param $composer
+	 * @param \Composer\Autoload\ClassLoader $composer The Composer class loader instance.
+	 *
 	 * @since 1.0.0
 	 */
 	public function getClassLoader( $composer ) {
@@ -125,9 +128,10 @@ final class Bootstrap extends Base {
 	}
 
 	/**
-	 * Initialize the requested classes
+	 * Initialize and load the requested classes.
 	 *
-	 * @param $classes : The loaded classes.
+	 * @param array $classes An array of loaded classes and their initialization configurations.
+	 *
 	 * @since 1.0.0
 	 */
 	public function loadClasses( $classes ) {
@@ -168,12 +172,15 @@ final class Bootstrap extends Base {
 				\do_action( 'the_plugin_name_class_initialize_failed', $err, $class );
 				Errors::wpDie(
 					sprintf(  /* translators: %s: php class namespace */
-						__( 'Could not load class "%s". The "init" method is probably missing or try a `composer dumpautoload -o` to refresh the autoloader.',
+						__(
+							'Could not load class "%s". The "init" method is probably missing or try a `composer dumpautoload -o` to refresh the autoloader.',
 							'the-plugin-name-text-domain'
-						), $class
+						),
+						$class
 					),
 					__( 'Plugin initialize failed', 'the-plugin-name-text-domain' ),
-					__FILE__, $err
+					__FILE__,
+					$err
 				);
 			}
 		}
@@ -182,12 +189,12 @@ final class Bootstrap extends Base {
 	/**
 	 * Get classes based on the directory automatically using the Composer autoload
 	 *
-	 * @param string $namespace Class name to find.
+	 * @param string $target_namespace Class name to find.
 	 * @return array Return the classes.
 	 * @since 1.0.0
 	 */
-	public function getClasses( string $namespace ): array {
-		$namespace = $this->plugin->namespace() . '\\' . $namespace;
+	public function getClasses( string $target_namespace ): array {
+		$target_namespace = $this->plugin->namespace() . '\\' . $target_namespace;
 		if ( is_object( $this->composer ) !== false ) {
 			$classmap = $this->composer->getClassMap();
 
@@ -200,7 +207,7 @@ final class Bootstrap extends Base {
 				}
 				$classes = array_keys( $classmap );
 				foreach ( $classes as $class ) {
-					if ( 0 !== strncmp( (string) $class, $namespace, strlen( $namespace ) ) ) {
+					if ( 0 !== strncmp( (string) $class, $target_namespace, strlen( $target_namespace ) ) ) {
 						continue;
 					}
 					$this->class_list[] = $class;
@@ -209,67 +216,73 @@ final class Bootstrap extends Base {
 			}
 		}
 
+        // phpcs:disable
 		// If the composer.json file is updated then Autoloader is not optimized and we
 		// can't load classes via the Autoloader. The `composer dumpautoload -o` command needs to
 		// to be called; in the mean time we're going to load the classes differently which will
 		// be a bit slower. The plugin needs to be optimized before production-release
 		// Errors::writeLog(
-		//    [
-		//        'title'   => __( '{{The Plugin Name}} classes are not being loaded by Composer\'s Autoloader' ),
-		//        'message' => __( 'Try a `composer dumpautoload -o` to optimize the autoloader that will improve the performance on autoloading itself.' )
-		//    ]
-		//);
-		return $this->getByExtraction( $namespace );
+		// [
+		// 'title'   => __( '{{The Plugin Name}} classes are not being loaded by Composer\'s Autoloader' ),
+		// 'message' => __( 'Try a `composer dumpautoload -o` to optimize the autoloader that will improve the performance on autoloading itself.' )
+		// ]
+		// );
+        //phpcs:enable
+		return $this->getByExtraction( $target_namespace );
 	}
 
 	/**
-	 * Get classes by file extraction, will only run if autoload fails
+	 * Get classes using file extraction, intended for use when autoloading fails.
 	 *
-	 * @param $namespace
-	 * @return array
+	 * @param string $target_namespace The namespace to filter the extracted classes.
+	 *
+	 * @return array An array containing the extracted class names.
+	 *
 	 * @since 1.0.0
 	 */
-	public function getByExtraction( $namespace ): array {
+	public function getByExtraction( $target_namespace ): array {
 		if ( ! isset( $this->bootstrap['initialized_classes']['load_by'] ) ) {
 			$this->bootstrap['initialized_classes']['load_by'] = 'Extraction; Try a `composer dumpautoload -o` to optimize the autoloader.';
 		}
-		$find_all_classes = [];
+		$find_all_classes = array();
 		foreach ( $this->filesFromThisDir() as $file ) {
-			$file_data = [
+			$file_data        = array(
 				// phpcs:disable
 				// file_get_contents() is only discouraged by PHPCS for remote files
 				'tokens'    => token_get_all( file_get_contents( $file->getRealPath() ) ),
 				// phpcs:enable
 				'namespace' => '',
-			];
+			);
 			$find_all_classes = array_merge( $find_all_classes, $this->extractClasses( $file_data ) );
 		}
-		$this->classBelongsTo( $find_all_classes, $namespace . '\\' );
+		$this->classBelongsTo( $find_all_classes, $target_namespace . '\\' );
 		return $this->class_list;
 	}
 
 	/**
-	 * Extract class from file, will only run if autoload fails
+	 * Extract classes from a file's token data, intended for use when autoload fails.
 	 *
-	 * @param $file_data
-	 * @param array $classes
-	 * @return array
+	 * @param array $file_data An array of token data for the file.
+	 * @param array $classes   (Optional) An array of classes to which the extracted classes will be added.
+	 *
+	 * @return array An array containing the extracted class names.
+	 *
 	 * @since 1.0.0
 	 */
-	public function extractClasses( $file_data, $classes = [] ): array {
+	public function extractClasses( $file_data, $classes = array() ): array {
 		for ( $index = 0; isset( $file_data['tokens'][ $index ] ); $index++ ) {
 			if ( ! isset( $file_data['tokens'][ $index ][0] ) ) {
 				continue;
 			}
 			if ( T_NAMESPACE === $file_data['tokens'][ $index ][0] ) {
-				$index += 2; // Skip namespace keyword and whitespace
+				$index += 2; // Skip namespace keyword and whitespace.
 				while ( isset( $file_data['tokens'][ $index ] ) && is_array( $file_data['tokens'][ $index ] ) ) {
 					$file_data['namespace'] .= $file_data['tokens'][ $index++ ][1];
 				}
 			}
 			if ( T_CLASS === $file_data['tokens'][ $index ][0] && T_WHITESPACE === $file_data['tokens'][ $index + 1 ][0] && T_STRING === $file_data['tokens'][ $index + 2 ][0] ) {
 				$index += 2; // Skip class keyword and whitespace
-				// So it only works with 1 class per file (which should be psr-4 compliant)
+				// So it only works with 1 class per file (which should be psr-4 compliant).
 				$classes[] = $file_data['namespace'] . '\\' . $file_data['tokens'][ $index ][1];
 				break;
 			}
@@ -290,15 +303,16 @@ final class Bootstrap extends Base {
 	}
 
 	/**
-	 * Checks if class belongs to namespace, will only run if autoload fails
+	 * Check if a class belongs to a specific namespace and add it to the class list if it does.
 	 *
-	 * @param $classes
-	 * @param $namespace
+	 * @param array  $classes An array of class names to check.
+	 * @param string $target_namespace The namespace to check against.
+	 *
 	 * @since 1.0.0
 	 */
-	public function classBelongsTo( $classes, $namespace ) {
+	public function classBelongsTo( $classes, $target_namespace ) {
 		foreach ( $classes as $class ) {
-			if ( strpos( $class, $namespace ) === 0 ) {
+			if ( strpos( $class, $target_namespace ) === 0 ) {
 				$this->class_list[] = $class;
 			}
 		}
@@ -316,9 +330,13 @@ final class Bootstrap extends Base {
 	}
 
 	/**
-	 * @param $timer
-	 * @param string $tag
-	 * @return string
+	 * Stop the execution timer and return a formatted string.
+	 *
+	 * @param float  $timer The starting timestamp of the timer.
+	 * @param string $tag The tag or label for the timer (default: 'Execution time').
+	 *
+	 * @return string Formatted string indicating the elapsed time and the tag.
+	 *
 	 * @since 1.0.0
 	 */
 	public function stopExecutionTimer( $timer, $tag = 'Execution time' ): string {
@@ -336,15 +354,19 @@ final class Bootstrap extends Base {
 		if ( $this->bootstrap['debug'] === true ) {
 			$this->bootstrap['execution_time'] =
 				'Total execution time in seconds: ' . ( microtime( true ) - $this->bootstrap['execution_time']['start'] );
-			add_action( 'shutdown', function () {
-				ini_set( 'highlight.comment', '#969896; font-style: italic' );
-				ini_set( 'highlight.default', '#FFFFFF' );
-				ini_set( 'highlight.html', '#D16568; font-size: 13px; padding: 0; display: block;' );
-				ini_set( 'highlight.keyword', '#7FA3BC; font-weight: bold; padding:0;' );
-				ini_set( 'highlight.string', '#F2C47E' );
-				$output = highlight_string( "<?php\n\n" . var_export( $this->bootstrap, true ), true );
-				echo "<div style=\"background-color: #1C1E21; padding:5px; position: fixed; z-index:9999; bottom:0;\">{$output}</div>";
-			} );
+			add_action(
+				'shutdown',
+				function () {
+					ini_set( 'highlight.comment', '#969896; font-style: italic' );
+					ini_set( 'highlight.default', '#FFFFFF' );
+					ini_set( 'highlight.html', '#D16568; font-size: 13px; padding: 0; display: block;' );
+					ini_set( 'highlight.keyword', '#7FA3BC; font-weight: bold; padding:0;' );
+					ini_set( 'highlight.string', '#F2C47E' );
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_var_export
+					$output = highlight_string( "<?php\n\n" . var_export( $this->bootstrap, true ), true );
+					echo wp_kses_post( "<div style=\"background-color: #1C1E21; padding:5px; position: fixed; z-index:9999; bottom:0;\">{$output}</div>" );
+				}
+			);
 		}
 	}
 }

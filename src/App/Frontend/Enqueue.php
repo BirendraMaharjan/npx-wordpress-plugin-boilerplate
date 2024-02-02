@@ -37,7 +37,7 @@ class Enqueue extends Base {
 		 *
 		 * Add plugin code here
 		 */
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueueScripts' ] );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueueScripts' ) );
 	}
 
 	/**
@@ -46,42 +46,44 @@ class Enqueue extends Base {
 	 * @since 1.0.0
 	 */
 	public function enqueueScripts() {
-		// Enqueue CSS
+		// Enqueue CSS.
 		foreach (
-			[
-				[
-					'deps'    => [],
+			array(
+				array(
+					'deps'    => array(),
 					'handle'  => 'plugin-name-frontend-css',
 					'media'   => 'all',
 					'source'  => plugins_url( '/assets/public/css/frontend.css', _THE_PLUGIN_NAME_PLUGIN_FILE ), // phpcs:disable ImportDetection.Imports.RequireImports.Symbol -- this constant is global
 					'version' => $this->plugin->version(),
-				],
-			] as $css ) {
+				),
+			) as $css ) {
 			wp_enqueue_style( $css['handle'], $css['source'], $css['deps'], $css['version'], $css['media'] );
 		}
-		// Enqueue JS
+		// Enqueue JS.
 		foreach (
-			[
-				[
-					'deps'      => [],
+			array(
+				array(
+					'deps'      => array(),
 					'handle'    => 'plugin-test-frontend-js',
 					'in_footer' => true,
 					'source'    => plugins_url( '/assets/public/js/frontend.js', _THE_PLUGIN_NAME_PLUGIN_FILE ), // phpcs:disable ImportDetection.Imports.RequireImports.Symbol -- this constant is global
 					'version'   => $this->plugin->version(),
-				],
-			] as $js ) {
+				),
+			) as $js ) {
 			wp_enqueue_script( $js['handle'], $js['source'], $js['deps'], $js['version'], $js['in_footer'] );
 		}
 
-		// Send variables to JS
+		// Send variables to JS.
 		global $wp_query;
 
-		// localize script and send variables
-		wp_localize_script( 'plugin-test-frontend-js', 'plugin_frontend_script',
-			[
+		// localize script and send variables.
+		wp_localize_script(
+			'plugin-test-frontend-js',
+			'plugin_frontend_script',
+			array(
 				'plugin_frontend_url'  => admin_url( 'admin-ajax.php' ),
 				'plugin_wp_query_vars' => $wp_query->query_vars,
-			]
+			)
 		);
 	}
 }

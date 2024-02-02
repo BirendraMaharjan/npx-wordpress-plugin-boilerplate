@@ -50,12 +50,12 @@
     #############################################################################
     -->
 
-    <rule ref="WPThemeReview"/>
+    <!-- rule ref="WPThemeReview"/ -->
 
     <rule ref="WordPress">
         <!-- Exclude as plugin adheres to the PSR-4 standard. -->
         <exclude name="WordPress.Files.FileName"/>
-        <exclude name="NeutronStandard.AssignAlign.DisallowAssignAlign.Aligned"/>
+        <exclude name="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid"/>
     </rule>
 
     <!-- Verify that the text_domain is set to the desired text-domain.

@@ -36,8 +36,8 @@ class Example extends Base {
 		 * @see Bootstrap::__construct
 		 */
 
-		add_action( 'wp', [ $this, 'activationDeactivationExample' ] );
-		add_action( 'plugin_cronjobs', [ $this, 'cronjobRepeatingFunctionExample' ] );
+		add_action( 'wp', array( $this, 'activationDeactivationExample' ) );
+		add_action( 'plugin_cronjobs', array( $this, 'cronjobRepeatingFunctionExample' ) );
 	}
 
 	/**
@@ -60,6 +60,6 @@ class Example extends Base {
 	 * @since 1.0.0
 	 */
 	public function cronjobRepeatingFunctionExample() {
-		// do here what needs to be done automatically as per schedule
+		// do here what needs to be done automatically as per schedule.
 	}
 }

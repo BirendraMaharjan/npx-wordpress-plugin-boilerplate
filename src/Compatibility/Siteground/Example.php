@@ -33,13 +33,13 @@ class Example {
 		 *
 		 * @see Bootstrap::__construct
 		 */
-		add_filter( 'sgo_css_combine_exclude', [ $this, 'excludeCssCombine' ] );
+		add_filter( 'sgo_css_combine_exclude', array( $this, 'excludeCssCombine' ) );
 	}
 
 	/**
 	 * Siteground optimizer compatibility.
 	 *
-	 * @param array $exclude_list
+	 * @param array $exclude_list An array of CSS files to be excluded from combining.
 	 *
 	 * @return array
 	 * @since 1.0.0

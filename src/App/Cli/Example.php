@@ -36,7 +36,7 @@ class Example extends Base {
 		 * @see Bootstrap::__construct
 		 */
 		if ( class_exists( \WP_CLI ) ) {
-			\WP_CLI::add_command( 'plugin_commandname', [ $this, 'commandExample' ] );
+			\WP_CLI::add_command( 'plugin_commandname', array( $this, 'commandExample' ) );
 		}
 	}
 
@@ -53,15 +53,15 @@ class Example extends Base {
 		\WP_CLI::success( $args[0] );
 		// Message prefixed with "Warning: ".
 		\WP_CLI::warning( $args[0] );
-		// Message prefixed with "Debug: ". when '--debug' is used
+		// Message prefixed with "Debug: ". when '--debug' is used.
 		\WP_CLI::debug( $args[0] );
 		// Message prefixed with "Error: ".
 		\WP_CLI::error( $args[0] );
-		// Message with no prefix
+		// Message with no prefix.
 		\WP_CLI::log( $args[0] );
-		// Colorize a string for output
+		// Colorize a string for output.
 		\WP_CLI::colorize( $args[0] );
-		// Halt script execution with a specific return code
+		// Halt script execution with a specific return code.
 		\WP_CLI::halt( $args[0] );
 	}
 }

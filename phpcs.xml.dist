@@ -2,7 +2,7 @@
 <ruleset name="The Plugin Name ruleset">
 
     <!-- Set a description for this ruleset. -->
-    <description>>A custom set of code standard rules to check for WordPress themes/plugins.</description>
+    <description>Ruleset for the The Plugin Name.</description>
 
     <!-- Use colors in output -->
     <arg name="colors"/>
@@ -50,7 +50,7 @@
     #############################################################################
     -->
 
-    <!--<rule ref="WPThemeReview"/>-->
+    <rule ref="WPThemeReview"/>
 
     <rule ref="WordPress">
         <!-- Exclude as plugin adheres to the PSR-4 standard. -->

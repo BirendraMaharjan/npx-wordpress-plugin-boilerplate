@@ -26,6 +26,12 @@ use ThePluginName\Common\Utils\Errors;
  * @since 1.0.0
  */
 final class Requirements extends Base {
+
+    /**
+     * @var array
+     */
+    public $requirements;
+
 	/**
 	 * Specifications for the requirements
 	 *
